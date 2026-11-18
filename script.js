@@ -19,8 +19,6 @@ function platformFor(url) {
   try {
     const host = new URL(url).hostname.toLowerCase().replace(/^www\./, "");
     if (host === "tiktok.com" || host.endsWith(".tiktok.com")) return "TikTok";
-    if (host === "instagram.com" || host.endsWith(".instagram.com")) return "Instagram";
-    if (host === "youtube.com" || host.endsWith(".youtube.com") || host === "youtu.be") return "YouTube";
   } catch {}
   return null;
 }
@@ -87,10 +85,10 @@ $("prepareBtn").addEventListener("click", () => {
   if (!url) return toast("Paste a link first.");
   if (!isHttpUrl(url)) return toast("Please enter a valid http or https link.");
   const platform = platformFor(url);
-  if (!platform) return toast("This link is not from a recognized platform.");
+  if (!platform) return toast("This first build supports TikTok links only.");
   currentLink = { url, platform };
   $("resultTitle").textContent = `${platform} link recognized`;
-  $("resultMessage").textContent = "The link is valid for this preview. Actual media retrieval is not connected yet; use content you own or are authorized to save.";
+  $("resultMessage").textContent = "TikTok link recognized. Download processing is the next development step. Only save videos you own or have permission to download.";
   $("resultCard").classList.remove("hidden");
   addHistory(currentLink);
   toast(`${platform} link checked.`);
@@ -110,61 +108,3 @@ $("clearDataBtn").addEventListener("click", () => {
 
 renderAll();
 
-
-// V1.1: local video import, preview, and save
-let selectedVideoFile = null;
-let selectedVideoUrl = null;
-
-function formatBytes(bytes) {
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function clearSelectedVideo() {
-  if (selectedVideoUrl) URL.revokeObjectURL(selectedVideoUrl);
-  selectedVideoFile = null;
-  selectedVideoUrl = null;
-  $("videoPreview").removeAttribute("src");
-  $("videoPreview").load();
-  $("videoFileInput").value = "";
-  $("videoResult").classList.add("hidden");
-}
-
-$("chooseVideoBtn").addEventListener("click", () => $("videoFileInput").click());
-
-$("videoFileInput").addEventListener("change", () => {
-  const file = $("videoFileInput").files && $("videoFileInput").files[0];
-  if (!file) return;
-  if (!file.type.startsWith("video/")) {
-    clearSelectedVideo();
-    return toast("Please choose a video file.");
-  }
-  if (selectedVideoUrl) URL.revokeObjectURL(selectedVideoUrl);
-  selectedVideoFile = file;
-  selectedVideoUrl = URL.createObjectURL(file);
-  $("videoPreview").src = selectedVideoUrl;
-  $("videoFileName").textContent = file.name;
-  $("videoFileInfo").textContent = `${formatBytes(file.size)} · ${file.type || "Video"}`;
-  $("videoResult").classList.remove("hidden");
-  toast("Video ready for preview.");
-});
-
-$("saveVideoBtn").addEventListener("click", () => {
-  if (!selectedVideoFile || !selectedVideoUrl) return toast("Choose a video first.");
-  const link = document.createElement("a");
-  link.href = selectedVideoUrl;
-  link.download = selectedVideoFile.name || "zorus-video";
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  toast("Save requested. Check your Downloads folder.");
-});
-
-$("removeVideoBtn").addEventListener("click", () => {
-  clearSelectedVideo();
-  toast("Selected video removed.");
-});
-
-window.addEventListener("beforeunload", () => {
-  if (selectedVideoUrl) URL.revokeObjectURL(selectedVideoUrl);
-});
