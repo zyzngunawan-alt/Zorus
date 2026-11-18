@@ -20,3 +20,13 @@ Open `index.html` in a browser, or serve this folder with a local static web ser
 - `style.css` - visual design
 - `script.js` - interactions and local storage
 - `manifest.json` - basic web app metadata
+
+
+## V1.1 local video import
+- Select a video file stored on the device.
+- Preview it in the app.
+- Request a local download/save copy through the browser.
+- The selected video is not uploaded to a server.
+- The selected video is not retained after the page is closed or refreshed.
+
+This does not download videos from TikTok, Instagram, or YouTube links. Platform links are recognized and saved as links only. Use official platform export/download features or media you are authorized to access.
