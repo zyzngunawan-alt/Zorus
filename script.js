@@ -1,3 +1,4 @@
+
 const $ = (id) => document.getElementById(id);
 const STORAGE_KEY = "zorus_v1_data";
 const TIKTOK_API = "https://zorus-api.zyzngunawan.workers.dev/api/tiktok";
@@ -23,6 +24,7 @@ function persist() {
 
 function toast(message) {
   const el = $("toast");
+  if (!el) return;
   el.textContent = message;
   el.classList.add("show");
   clearTimeout(toast.timer);
@@ -57,6 +59,8 @@ function addHistory(item) {
 function renderList(listId, emptyId, items, isSaved) {
   const list = $(listId);
   const empty = $(emptyId);
+  if (!list || !empty) return;
+
   list.innerHTML = "";
   empty.classList.toggle("hidden", items.length > 0);
 
@@ -112,11 +116,12 @@ function clearResultDetails() {
 }
 
 function showTikTokResult(result) {
-  clearResultDetails();
+  const oldDetails = $("apiDetails");
+  if (oldDetails) oldDetails.remove();
 
-  $("resultTitle").textContent = "TikTok link checked";
+  $("resultTitle").textContent = "TikTok video preview";
   $("resultMessage").textContent =
-    "Zorus connected to TikTok. The available video information is shown below.";
+    "Zorus retrieved the information TikTok makes available for this video.";
 
   const details = document.createElement("div");
   details.id = "apiDetails";
@@ -128,7 +133,7 @@ function showTikTokResult(result) {
     image.alt = "TikTok video thumbnail";
     image.loading = "lazy";
     image.style.width = "100%";
-    image.style.maxHeight = "240px";
+    image.style.maxHeight = "260px";
     image.style.objectFit = "contain";
     image.style.borderRadius = "12px";
     details.append(image);
@@ -141,20 +146,74 @@ function showTikTokResult(result) {
     fields.push(["Dimensions", `${result.width} × ${result.height}`]);
   }
 
-  if (fields.length) {
-    fields.forEach(([label, value]) => {
-      const line = document.createElement("p");
-      line.style.margin = "8px 0";
-      const strong = document.createElement("strong");
-      strong.textContent = `${label}: `;
-      line.append(strong, document.createTextNode(value));
-      details.append(line);
-    });
-  } else {
+  fields.forEach(([label, value]) => {
+    const line = document.createElement("p");
+    line.style.margin = "8px 0";
+
+    const strong = document.createElement("strong");
+    strong.textContent = `${label}: `;
+
+    line.append(strong, document.createTextNode(String(value)));
+    details.append(line);
+  });
+
+  if (!result.thumbnail && fields.length === 0) {
     const note = document.createElement("p");
     note.textContent =
-      "TikTok returned an embed preview, but did not provide a title, creator name, or thumbnail for this link.";
+      "TikTok returned limited video information. You can still open the original video on TikTok.";
     details.append(note);
+  }
+
+  let embedUrl = null;
+
+  if (result.embedHtml && typeof DOMParser !== "undefined") {
+    try {
+      const parsed = new DOMParser().parseFromString(
+        result.embedHtml,
+        "text/html"
+      );
+      const iframe = parsed.querySelector("iframe");
+
+      if (iframe && iframe.getAttribute("src")) {
+        const candidate = new URL(
+          iframe.getAttribute("src"),
+          "https://www.tiktok.com"
+        );
+
+        if (
+          candidate.origin === "https://www.tiktok.com" &&
+          candidate.pathname.startsWith("/player/v1/")
+        ) {
+          embedUrl = candidate.href;
+        }
+      }
+    } catch {
+      embedUrl = null;
+    }
+  }
+
+  if (embedUrl) {
+    const heading = document.createElement("p");
+    heading.textContent = "Video preview";
+    heading.style.fontWeight = "bold";
+    heading.style.marginTop = "14px";
+
+    const frame = document.createElement("iframe");
+    frame.src = embedUrl;
+    frame.title = "TikTok video player";
+    frame.loading = "lazy";
+    frame.allowFullscreen = true;
+    frame.allow =
+      "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    frame.style.display = "block";
+    frame.style.width = "100%";
+    frame.style.aspectRatio = "9 / 16";
+    frame.style.maxHeight = "480px";
+    frame.style.border = "0";
+    frame.style.borderRadius = "12px";
+    frame.style.background = "#000";
+
+    details.append(heading, frame);
   }
 
   const openLink = document.createElement("a");
@@ -163,7 +222,7 @@ function showTikTokResult(result) {
   openLink.rel = "noopener noreferrer";
   openLink.textContent = "Open video on TikTok";
   openLink.style.display = "inline-block";
-  openLink.style.marginTop = "8px";
+  openLink.style.marginTop = "12px";
   details.append(openLink);
 
   $("resultCard").insertBefore(details, $("saveLinkBtn"));
@@ -210,7 +269,13 @@ $("prepareBtn").addEventListener("click", async () => {
   try {
     const endpoint = `${TIKTOK_API}?url=${encodeURIComponent(url)}`;
     const response = await fetch(endpoint, { method: "GET" });
-    const result = await response.json();
+
+    let result;
+    try {
+      result = await response.json();
+    } catch {
+      throw new Error("Zorus API returned an unreadable response.");
+    }
 
     if (!response.ok || !result.success) {
       throw new Error(result.error || "TikTok information is unavailable.");
