@@ -1,110 +1,99 @@
-const $ = (id) => document.getElementById(id);
-const STORAGE_KEY = "zorus_v1_data";
-let data = loadData();
-let currentLink = null;
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0912">
+  <meta name="description" content="Zorus is a clean media link organizer and downloader interface.">
+  <title>Zorus</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Zorus home">
+        <span class="brand-mark">Z</span>
+        <span>Zorus</span>
+      </a>
+      <button class="icon-btn" id="settingsShortcut" aria-label="Open settings">⚙</button>
+    </header>
 
-function loadData() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { saved: [], history: [] }; }
-  catch { return { saved: [], history: [] }; }
-}
-function persist() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
-function toast(message) {
-  const el = $("toast");
-  el.textContent = message;
-  el.classList.add("show");
-  clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => el.classList.remove("show"), 2400);
-}
-function platformFor(url) {
-  try {
-    const host = new URL(url).hostname.toLowerCase().replace(/^www\./, "");
-    if (host === "tiktok.com" || host.endsWith(".tiktok.com")) return "TikTok";
-  } catch {}
-  return null;
-}
-function isHttpUrl(value) {
-  try { const u = new URL(value); return u.protocol === "https:" || u.protocol === "http:"; }
-  catch { return false; }
-}
-function addHistory(item) {
-  data.history.unshift({ ...item, checkedAt: new Date().toISOString() });
-  data.history = data.history.slice(0, 30);
-  persist();
-}
-function renderList(listId, emptyId, items, isSaved) {
-  const list = $(listId), empty = $(emptyId);
-  list.innerHTML = "";
-  empty.classList.toggle("hidden", items.length > 0);
-  items.forEach((item, index) => {
-    const card = document.createElement("article");
-    card.className = "glass-panel link-item";
-    const title = document.createElement("strong");
-    title.textContent = `${item.platform || "Media"} link`;
-    const url = document.createElement("small");
-    url.textContent = item.url;
-    card.append(title, url);
-    if (isSaved) {
-      const remove = document.createElement("button");
-      remove.className = "secondary-btn";
-      remove.style.marginTop = "10px";
-      remove.textContent = "Remove";
-      remove.addEventListener("click", () => {
-        data.saved.splice(index, 1); persist(); renderAll(); toast("Link removed.");
-      });
-      card.append(remove);
-    }
-    list.append(card);
-  });
-}
-function renderAll() {
-  renderList("downloadsList", "downloadsEmpty", data.saved, true);
-  renderList("historyList", "historyEmpty", data.history, false);
-}
-function showPage(pageId) {
-  document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === pageId));
-  document.querySelectorAll(".nav-item").forEach(b => b.classList.toggle("selected", b.dataset.page === pageId));
-  if (pageId === "downloadsPage" || pageId === "historyPage") renderAll();
-}
-document.querySelectorAll(".nav-item").forEach(btn => btn.addEventListener("click", () => showPage(btn.dataset.page)));
-$("settingsShortcut").addEventListener("click", () => showPage("settingsPage"));
+    <main>
+      <section class="page active" id="homePage">
+        <div class="hero">
+          <p class="eyebrow">YOUR MEDIA SPACE</p>
+          <h1>Save what<br><span>matters.</span></h1>
+          <p class="muted">Keep your links organized and prepare media you own or have permission to save.</p>
+        </div>
 
-$("pasteBtn").addEventListener("click", async () => {
-  try {
-    const value = await navigator.clipboard.readText();
-    if (!value) return toast("Clipboard is empty.");
-    $("urlInput").value = value.trim();
-    toast("Link pasted.");
-  } catch {
-    $("urlInput").focus();
-    toast("Clipboard access unavailable. Paste the link manually.");
-  }
-});
+        <section class="glass-panel input-panel">
+          <label for="urlInput">Video link</label>
+          <div class="url-field">
+            <span class="link-icon">↗</span>
+            <input id="urlInput" type="url" inputmode="url" placeholder="Paste a video URL here…" autocomplete="url">
+            <button class="paste-btn" id="pasteBtn" type="button">Paste</button>
+          </div>
+          <p class="field-hint" id="platformHint">TikTok links are supported in this first build. Other platforms will follow.</p>
+          <button class="primary-btn" id="prepareBtn" type="button">
+            <span>Check link</span><span aria-hidden="true">↗</span>
+          </button>
+          <div class="result-card hidden" id="resultCard" aria-live="polite">
+            <div class="result-top">
+              <span class="status-dot"></span>
+              <strong id="resultTitle">Link recognized</strong>
+            </div>
+            <p id="resultMessage"></p>
+            <button class="secondary-btn" id="saveLinkBtn" type="button">Save link to library</button>
+          </div>
+        </section>
 
-$("prepareBtn").addEventListener("click", () => {
-  const url = $("urlInput").value.trim();
-  if (!url) return toast("Paste a link first.");
-  if (!isHttpUrl(url)) return toast("Please enter a valid http or https link.");
-  const platform = platformFor(url);
-  if (!platform) return toast("This first build supports TikTok links only.");
-  currentLink = { url, platform };
-  $("resultTitle").textContent = `${platform} link recognized`;
-  $("resultMessage").textContent = "TikTok link recognized. Download processing is the next development step. Only save videos you own or have permission to download.";
-  $("resultCard").classList.remove("hidden");
-  addHistory(currentLink);
-  toast(`${platform} link checked.`);
-});
+        <section class="platform-section">
+          <div class="section-heading"><h2>Platforms</h2><span>LINK RECOGNITION</span></div>
+          <div class="platform-grid">
+            <div class="glass-panel platform-card"><span class="platform-logo tiktok">♪</span><strong>TikTok</strong><small>First platform</small></div>
+            <div class="glass-panel platform-card"><span class="platform-logo instagram">◎</span><strong>Instagram</strong><small>Coming later</small></div>
+            <div class="glass-panel platform-card"><span class="platform-logo youtube">▶</span><strong>YouTube</strong><small>Coming later</small></div>
+          </div>
+        </section>
+        <p class="legal-note">Only save content you created, own, or have permission to download. Platform restrictions still apply.</p>
+      </section>
 
-$("saveLinkBtn").addEventListener("click", () => {
-  if (!currentLink) return;
-  if (data.saved.some(x => x.url === currentLink.url)) return toast("This link is already in your library.");
-  data.saved.unshift({ ...currentLink, savedAt: new Date().toISOString() });
-  persist(); renderAll(); toast("Link saved to your library.");
-});
+      <section class="page" id="downloadsPage">
+        <div class="page-heading"><p class="eyebrow">YOUR LIBRARY</p><h1>Saved links</h1><p class="muted">Links you have added from this device.</p></div>
+        <div class="empty-state glass-panel" id="downloadsEmpty"><span>◇</span><strong>Your library is empty</strong><p>Recognize a link on Home, then save it here.</p></div>
+        <div class="link-list" id="downloadsList"></div>
+      </section>
 
-$("clearDataBtn").addEventListener("click", () => {
-  if (!confirm("Clear all saved links and history on this device?")) return;
-  data = { saved: [], history: [] }; persist(); renderAll(); toast("Local data cleared.");
-});
+      <section class="page" id="historyPage">
+        <div class="page-heading"><p class="eyebrow">RECENT ACTIVITY</p><h1>History</h1><p class="muted">Your recently checked links.</p></div>
+        <div class="empty-state glass-panel" id="historyEmpty"><span>◷</span><strong>No activity yet</strong><p>Checked links will appear here.</p></div>
+        <div class="link-list" id="historyList"></div>
+      </section>
 
-renderAll();
+      <section class="page" id="settingsPage">
+        <div class="page-heading"><p class="eyebrow">PREFERENCES</p><h1>Settings</h1><p class="muted">A few details about your Zorus app.</p></div>
+        <div class="glass-panel settings-card">
+          <div><strong>App version</strong><small>Early preview · V1</small></div><span class="setting-value">1.0.0</span>
+        </div>
+        <div class="glass-panel settings-card">
+          <div><strong>Appearance</strong><small>Dark premium purple</small></div><span class="setting-value">●</span>
+        </div>
+        <div class="glass-panel settings-card">
+          <div><strong>Privacy</strong><small>Saved link data stays in this browser on this device.</small></div><span class="setting-value">Local</span>
+        </div>
+        <button class="secondary-btn clear-btn" id="clearDataBtn" type="button">Clear saved links and history</button>
+      </section>
+    </main>
 
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button class="nav-item selected" data-page="homePage"><span>⌂</span><small>Home</small></button>
+      <button class="nav-item" data-page="downloadsPage"><span>⇩</span><small>Library</small></button>
+      <button class="nav-item" data-page="historyPage"><span>◷</span><small>History</small></button>
+      <button class="nav-item" data-page="settingsPage"><span>⚙</span><small>Settings</small></button>
+    </nav>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
