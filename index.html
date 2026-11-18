@@ -34,7 +34,7 @@
             <input id="urlInput" type="url" inputmode="url" placeholder="Paste a video URL here…" autocomplete="url">
             <button class="paste-btn" id="pasteBtn" type="button">Paste</button>
           </div>
-          <p class="field-hint" id="platformHint">Supports link recognition for TikTok, Instagram and YouTube.</p>
+          <p class="field-hint" id="platformHint">TikTok links are supported in this first build. Other platforms will follow.</p>
           <button class="primary-btn" id="prepareBtn" type="button">
             <span>Check link</span><span aria-hidden="true">↗</span>
           </button>
@@ -48,30 +48,12 @@
           </div>
         </section>
 
-        <section class="glass-panel import-panel">
-          <div class="section-heading"><h2>Import your video</h2><span>DEVICE FILE</span></div>
-          <p class="field-hint import-hint">Choose a video saved on this device to preview it and save a copy. Only use content you own or have permission to use.</p>
-          <input id="videoFileInput" class="file-input" type="file" accept="video/*">
-          <button class="secondary-btn import-btn" id="chooseVideoBtn" type="button"><span>＋</span> Choose video</button>
-          <div class="video-result hidden" id="videoResult">
-            <video id="videoPreview" controls playsinline preload="metadata"></video>
-            <div class="video-details">
-              <strong id="videoFileName">Selected video</strong>
-              <small id="videoFileInfo"></small>
-            </div>
-            <div class="video-actions">
-              <button class="primary-btn" id="saveVideoBtn" type="button"><span>Save video to device</span><span>⇩</span></button>
-              <button class="text-btn" id="removeVideoBtn" type="button">Remove selected video</button>
-            </div>
-          </div>
-        </section>
-
         <section class="platform-section">
           <div class="section-heading"><h2>Platforms</h2><span>LINK RECOGNITION</span></div>
           <div class="platform-grid">
-            <div class="glass-panel platform-card"><span class="platform-logo tiktok">♪</span><strong>TikTok</strong><small>Link detection</small></div>
-            <div class="glass-panel platform-card"><span class="platform-logo instagram">◎</span><strong>Instagram</strong><small>Link detection</small></div>
-            <div class="glass-panel platform-card"><span class="platform-logo youtube">▶</span><strong>YouTube</strong><small>Link detection</small></div>
+            <div class="glass-panel platform-card"><span class="platform-logo tiktok">♪</span><strong>TikTok</strong><small>First platform</small></div>
+            <div class="glass-panel platform-card"><span class="platform-logo instagram">◎</span><strong>Instagram</strong><small>Coming later</small></div>
+            <div class="glass-panel platform-card"><span class="platform-logo youtube">▶</span><strong>YouTube</strong><small>Coming later</small></div>
           </div>
         </section>
         <p class="legal-note">Only save content you created, own, or have permission to download. Platform restrictions still apply.</p>
