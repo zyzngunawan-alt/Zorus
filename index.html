@@ -48,6 +48,24 @@
           </div>
         </section>
 
+        <section class="glass-panel import-panel">
+          <div class="section-heading"><h2>Import your video</h2><span>DEVICE FILE</span></div>
+          <p class="field-hint import-hint">Choose a video saved on this device to preview it and save a copy. Only use content you own or have permission to use.</p>
+          <input id="videoFileInput" class="file-input" type="file" accept="video/*">
+          <button class="secondary-btn import-btn" id="chooseVideoBtn" type="button"><span>＋</span> Choose video</button>
+          <div class="video-result hidden" id="videoResult">
+            <video id="videoPreview" controls playsinline preload="metadata"></video>
+            <div class="video-details">
+              <strong id="videoFileName">Selected video</strong>
+              <small id="videoFileInfo"></small>
+            </div>
+            <div class="video-actions">
+              <button class="primary-btn" id="saveVideoBtn" type="button"><span>Save video to device</span><span>⇩</span></button>
+              <button class="text-btn" id="removeVideoBtn" type="button">Remove selected video</button>
+            </div>
+          </div>
+        </section>
+
         <section class="platform-section">
           <div class="section-heading"><h2>Platforms</h2><span>LINK RECOGNITION</span></div>
           <div class="platform-grid">
