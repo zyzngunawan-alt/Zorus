@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0912">
+  <meta name="description" content="Zorus is a clean media link organizer and downloader interface.">
+  <title>Zorus</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Zorus home">
+        <span class="brand-mark">Z</span>
+        <span>Zorus</span>
+      </a>
+      <button class="icon-btn" id="settingsShortcut" aria-label="Open settings">⚙</button>
+    </header>
+
+    <main>
+      <section class="page active" id="homePage">
+        <div class="hero">
+          <p class="eyebrow">YOUR MEDIA SPACE</p>
+          <h1>Save what<br><span>matters.</span></h1>
+          <p class="muted">Keep your links organized and prepare media you own or have permission to save.</p>
+        </div>
+
+        <section class="glass-panel input-panel">
+          <label for="urlInput">Video link</label>
+          <div class="url-field">
+            <span class="link-icon">↗</span>
+            <input id="urlInput" type="url" inputmode="url" placeholder="Paste a video URL here…" autocomplete="url">
+            <button class="paste-btn" id="pasteBtn" type="button">Paste</button>
+          </div>
+          <p class="field-hint" id="platformHint">Supports link recognition for TikTok, Instagram and YouTube.</p>
+          <button class="primary-btn" id="prepareBtn" type="button">
+            <span>Check link</span><span aria-hidden="true">↗</span>
+          </button>
+          <div class="result-card hidden" id="resultCard" aria-live="polite">
+            <div class="result-top">
+              <span class="status-dot"></span>
+              <strong id="resultTitle">Link recognized</strong>
+            </div>
+            <p id="resultMessage"></p>
+            <button class="secondary-btn" id="saveLinkBtn" type="button">Save link to library</button>
+          </div>
+        </section>
+
+        <section class="platform-section">
+          <div class="section-heading"><h2>Platforms</h2><span>LINK RECOGNITION</span></div>
+          <div class="platform-grid">
+            <div class="glass-panel platform-card"><span class="platform-logo tiktok">♪</span><strong>TikTok</strong><small>Link detection</small></div>
+            <div class="glass-panel platform-card"><span class="platform-logo instagram">◎</span><strong>Instagram</strong><small>Link detection</small></div>
+            <div class="glass-panel platform-card"><span class="platform-logo youtube">▶</span><strong>YouTube</strong><small>Link detection</small></div>
+          </div>
+        </section>
+        <p class="legal-note">Only save content you created, own, or have permission to download. Platform restrictions still apply.</p>
+      </section>
+
+      <section class="page" id="downloadsPage">
+        <div class="page-heading"><p class="eyebrow">YOUR LIBRARY</p><h1>Saved links</h1><p class="muted">Links you have added from this device.</p></div>
+        <div class="empty-state glass-panel" id="downloadsEmpty"><span>◇</span><strong>Your library is empty</strong><p>Recognize a link on Home, then save it here.</p></div>
+        <div class="link-list" id="downloadsList"></div>
+      </section>
+
+      <section class="page" id="historyPage">
+        <div class="page-heading"><p class="eyebrow">RECENT ACTIVITY</p><h1>History</h1><p class="muted">Your recently checked links.</p></div>
+        <div class="empty-state glass-panel" id="historyEmpty"><span>◷</span><strong>No activity yet</strong><p>Checked links will appear here.</p></div>
+        <div class="link-list" id="historyList"></div>
+      </section>
+
+      <section class="page" id="settingsPage">
+        <div class="page-heading"><p class="eyebrow">PREFERENCES</p><h1>Settings</h1><p class="muted">A few details about your Zorus app.</p></div>
+        <div class="glass-panel settings-card">
+          <div><strong>App version</strong><small>Early preview · V1</small></div><span class="setting-value">1.0.0</span>
+        </div>
+        <div class="glass-panel settings-card">
+          <div><strong>Appearance</strong><small>Dark premium purple</small></div><span class="setting-value">●</span>
+        </div>
+        <div class="glass-panel settings-card">
+          <div><strong>Privacy</strong><small>Saved link data stays in this browser on this device.</small></div><span class="setting-value">Local</span>
+        </div>
+        <button class="secondary-btn clear-btn" id="clearDataBtn" type="button">Clear saved links and history</button>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button class="nav-item selected" data-page="homePage"><span>⌂</span><small>Home</small></button>
+      <button class="nav-item" data-page="downloadsPage"><span>⇩</span><small>Library</small></button>
+      <button class="nav-item" data-page="historyPage"><span>◷</span><small>History</small></button>
+      <button class="nav-item" data-page="settingsPage"><span>⚙</span><small>Settings</small></button>
+    </nav>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "Zorus",
+  "short_name": "Zorus",
+  "description": "A dark premium media link organizer.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b0912",
+  "theme_color": "#0b0912",
+  "icons": []
+}
